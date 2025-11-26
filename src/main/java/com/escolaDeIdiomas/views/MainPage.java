@@ -1,5 +1,10 @@
 package com.escolaDeIdiomas.views;
 
+import com.escolaDeIdiomas.HorizontalAlignment;
+import com.escolaDeIdiomas.VerticalAlignment;
+import com.escolaDeIdiomas.components.Column;
+import com.escolaDeIdiomas.components.Table;
+import com.escolaDeIdiomas.components.Button;
 import com.escolaDeIdiomas.controller.UserController;
 
 import javax.swing.*;
@@ -8,31 +13,36 @@ import java.awt.*;
 import java.lang.management.BufferPoolMXBean;
 
 public class MainPage extends JPanel {
-    JPanel wrapper = new JPanel(new BorderLayout()) {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-        }
-    };
-    public MainPage(){
-        JTable table = new JTable(UserController.getAllUsersInString(),
-                new String[]{"id", "nome"});
-        JScrollPane scroll = new JScrollPane(table);
-        wrapper.add(scroll, BorderLayout.CENTER);
-        wrapper.setOpaque(false);
-        setLayout(new BorderLayout());
-        add(wrapper, BorderLayout.CENTER);
-        setBackground(Color.darkGray);
+    Table table;
 
+    public MainPage() {
+        Column column = new Column();
+        add(column);
+        table = new Table(UserController.getAllUsersInString(),
+                new String[]{"id", "nome"});
+        column.add(table);
+        setLayout(null);
+        table.setVerticalAlignment(VerticalAlignment.CENTER);
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        table.setMinHeight(100);
+        table.setMinWidth(200);
+        table.setMaxWidth(500);
+        table.fillSize(0.5f);
+        setBackground(Color.darkGray);
+        table.setMgStart(50);
+        Button button = new Button("lixo", ()->{
+            System.out.println("aaaaaaaaa teste");
+        });
+
+        column.add(button);
+
+        column.fillMaxSize();
     }
 
     @Override
-    public void doLayout(){
+    public void doLayout() {
         super.doLayout();
-        int w = getWidth();
-        int h = getHeight();
-        wrapper.setPreferredSize(new Dimension((int)(0.8f * w), (int)(0.8f * h)));
-        wrapper.setBorder(new EmptyBorder((int)(0.1f*h),(int)(0.1f*w),(int)(0.1f*h),(int)(0.1f*w)));
-        wrapper.revalidate();
+        table.doLayout();
+
     }
 }
