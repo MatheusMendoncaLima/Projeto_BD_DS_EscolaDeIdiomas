@@ -9,6 +9,8 @@ public class User extends Table {
     public int id;
     @Column(type = ColumnTypes.STRING)
     public String name;
+    @Column(type = ColumnTypes.STRING)
+    public String email;
 
 
 }

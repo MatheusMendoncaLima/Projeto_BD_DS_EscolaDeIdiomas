@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.github.MatheusMendoncaLima</groupId>
             <artifactId>Java-MySql-ORM</artifactId>
-            <version>4d0ab6535a</version>
+            <version>96d75ee33d</version>
         </dependency>
     </dependencies>
 

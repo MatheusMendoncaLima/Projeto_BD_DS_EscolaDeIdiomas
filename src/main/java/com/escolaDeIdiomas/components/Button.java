@@ -4,21 +4,19 @@ import com.escolaDeIdiomas.Component;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class Button extends Component {
+public class Button extends com.escolaDeIdiomas.Component {
     private final JButton button;
     private String text;
     public Runnable action;
-    public Button(String text, Runnable action) {
-        super(new BorderLayout());
+    public Button(Component parent, String text, Runnable action) {
+        super(parent, new BorderLayout());
         button=new JButton();
         setText(text);
         setAction(action);
         button.addActionListener(e -> this.action.run());
         add(button);
-        setSize(30,60);
+        setSize(60,30);
     }
 
     public String getText() {
@@ -38,9 +36,4 @@ public class Button extends Component {
         this.action = action;
     }
 
-    @Override
-    public void doLayout() {
-        super.doLayout();
-        System.out.println("y do botao + " + getY());
-    }
 }

@@ -9,5 +9,8 @@ public class GeneralInitializer {
         db.connect();
         User.init(User.class, db);
         User.sync();
+        //adiciona
+        User user = new User();
+        user.save();
     }
 }

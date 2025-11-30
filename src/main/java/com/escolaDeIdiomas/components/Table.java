@@ -20,17 +20,11 @@ public class Table extends Component {
     }
 
 
-    public Table(Object[][] values, String[] columns){
-        super(new BorderLayout());
+    public Table(Component parent,Object[][] values, String[] columns){
+        super(parent,new BorderLayout());
         this.jTable=new JTable(values,columns);
         this.scroll = new JScrollPane(jTable);
         add(scroll, BorderLayout.CENTER);
         setOpaque(false);
-    }
-
-    @Override
-    public void doLayout() {
-        super.doLayout();
-        System.out.println("y da table - " + getY());
     }
 }

@@ -1,11 +1,14 @@
 package com.escolaDeIdiomas;
 
-import com.escolaDeIdiomas.components.Column;
+import com.escolaDeIdiomas.components.Box;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Component extends JPanel {
+    public final List<Runnable> executeAfterReady = new ArrayList<>();
     private int mgTop = 0;
     private int mgBottom = 0;
     private int mgStart = 0;
@@ -25,8 +28,9 @@ public class Component extends JPanel {
     private VerticalAlignment verticalAlignment = VerticalAlignment.TOP;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.START;
 
-    public Component(LayoutManager layoutManager) {
+    public Component(Component parent,LayoutManager layoutManager) {
         super(layoutManager);
+        if (parent != null) parent.add(this);
     }
 
     public int getMgTop() {
@@ -155,14 +159,19 @@ public class Component extends JPanel {
     }
 
     public void fillWidth(float percentage) {
+            executeAfterReady.add(()-> fillWidthRaw(percentage));
+    }
+    public void fillWidthRaw(float percentage) {
+        if (this.getParent() == null) return;
         horizontalPercentage = percentage;
         this.width = handleMaxAndMins((int) (getParent().getWidth() * percentage) - mgStart - mgEnd, maxWidth, minWidth);
     }
-
     public void fillMaxWidth() {
-        horizontalPercentage = 1f;
-        this.width = handleMaxAndMins(getParent().getWidth() - mgStart - mgEnd, maxWidth, minWidth);
+        fillWidth(1f);
+    }
 
+    public void fillMaxWidthRaw() {
+        fillWidthRaw(1f);
     }
 
     public void setWidth(int width) {
@@ -179,14 +188,23 @@ public class Component extends JPanel {
 
 
     public void fillHeight(float percentage) {
+        executeAfterReady.add(()->{
+            fillHeightRaw(percentage);
+        });
+    }
+    public void fillHeightRaw(float percentage) {
+        if (this.getParent() == null) return;
         verticalPercentage = percentage;
+
+
         this.height = handleMaxAndMins((int) (getParent().getHeight() * percentage) - mgTop - mgBottom, maxHeight, minHeight);
-        // System.out.println();
     }
 
     public void fillMaxHeight() {
-        verticalPercentage = 1f;
-        this.height = handleMaxAndMins(getParent().getHeight() - mgTop - mgBottom, maxHeight, minHeight);
+        fillHeight(1f);
+    }
+    public void fillMaxHeightRaw() {
+        fillHeightRaw(1f);
     }
 
     public void setHeight(int height) {
@@ -199,50 +217,66 @@ public class Component extends JPanel {
         fillWidth(percentage);
 
     }
+    public void fillSizeRaw(float percentage) {
+        fillHeightRaw(percentage);
+        fillWidthRaw(percentage);
+    }
 
     public void fillMaxSize() {
         fillMaxHeight();
         fillMaxWidth();
     }
+    public void fillMaxSizeRaw() {
+        fillMaxHeightRaw();
+        fillMaxWidthRaw();
+    }
 
-    public void setSize(int height, int width) {
+    public void setSize(int width,int height) {
         setHeight(height);
         setWidth(width);
     }
 
     public void updateWidthByPercentage() {
-        if (horizontalPercentage != -1) fillWidth(horizontalPercentage);
-        if (verticalPercentage != -1) fillHeight(verticalPercentage);
+        if (horizontalPercentage != -1) fillWidthRaw(horizontalPercentage);
+        if (verticalPercentage != -1) fillHeightRaw(verticalPercentage);
     }
 
     public void adjustPosition() {
 
-        if (!(this.getParent() instanceof Column)) return;
+        if ( this.getParent() == null || !(this.getParent() instanceof com.escolaDeIdiomas.components.Box)) return;
 
 
-        Column parent = (Column) this.getParent();
+        com.escolaDeIdiomas.components.Box parent = (Box) this.getParent();
         if (verticalAlignment == VerticalAlignment.BOTTOM) {
             setY(this.getParent().getY() + this.getParent().getHeight() - this.height - this.mgBottom);
         } else if (verticalAlignment == VerticalAlignment.CENTER) {
-            setY((this.getParent().getY() + this.getParent().getHeight() - this.height) / 2 - this.mgBottom);
+            setY(parent.getTargetY(this)+(parent.getHeight()- this.getHeight() + this.mgStart+this.mgEnd)/2);
         }else if (verticalAlignment == VerticalAlignment.TOP) {
-            setY(parent.getTargetY() + this.mgTop);
+            setY(parent.getTargetY(this) + this.mgTop);
         }
 
         if (horizontalAlignment == HorizontalAlignment.END) {
-            setX(this.getParent().getX() + this.getParent().getWidth() - this.width - this.mgEnd);
+            setX(parent.getTargetX(this)+parent.getWidth() - this.width - this.mgEnd);
         } else if (horizontalAlignment == HorizontalAlignment.CENTER) {
-            setX((this.getParent().getX() + this.getParent().getWidth() - this.width) / 2 - this.mgEnd);
+            setX(parent.getTargetX(this)+(parent.getWidth()- this.getWidth() + this.mgStart+this.mgEnd)/2);
         } else if (horizontalAlignment == HorizontalAlignment.START) {
-            setX(parent.getTargetX() + this.mgStart);
+            setX(parent.getTargetX(this) + this.mgStart);
 
         }
 
     }
 
 
+    public void executeAfterReady(){
+        for(Runnable runnable : executeAfterReady){
+            runnable.run();
+        }
+
+    }
+
     @Override
     public void doLayout() {
+        super.doLayout();
         super.doLayout();
         setBounds(x, y, width, height);
         updateWidthByPercentage();
